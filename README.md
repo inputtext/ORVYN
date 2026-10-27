@@ -229,3 +229,24 @@ This stores the speech model under `D:\ORVYN\VoiceModels` and sets user variable
 Push-to-talk: press Enter, say a complete request (e.g. *What is my CPU usage?*), then wait for local recognition and spoken output. Wake mode is available with `.\run_windows.ps1 -Mode voice`; Vosk recognition of coined names is not guaranteed, so test both *Or-vin* and *Or-vee-on*. Use `-NoSpeech` to disable spoken answers. Press Ctrl+C to end voice mode. Audio is processed in RAM; no microphone data is uploaded or written to a recording file by this component.
 
 The `mic-check` mode does not start Ollama or record microphone audio. It checks for Vosk model presence and an accessible input device.
+
+
+## Optional higher-accuracy local speech-to-text (Whisper)
+
+The small Vosk model can mishear natural conversational English. ORVYN now supports **faster-whisper base.en (CPU int8)** for *push-to-talk only*; existing Vosk wake mode is unchanged. This is a separately installed optional feature, not a replacement for Qwen3.
+
+Setup (requires internet once to download weights to D:):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_whisper_windows.ps1
+```
+
+Restart the terminal, then compare transcriptions:
+
+```powershell
+.\run_windows.ps1 -Mode ptt -Whisper -NoSpeech
+```
+
+Press Enter and speak clearly during the next eight seconds. The recognized text is printed before ORVYN decides what action to take. `-NoSpeech` temporarily disables spoken output so you can focus on transcription accuracy. Try **What is my CPU usage?**, **Open Notepad**, and **List my workspace**.
+
+The model's directory is `D:\ORVYN\VoiceModels\whisper-base.en`. Runtime loading requires `model.bin` to already exist and sets `local_files_only=True`. Audio clips are held in memory and are neither saved nor uploaded. Whisper in this first iteration is *not continuous listening* and does not handle the wake word; the separate Vosk-based wake mode remains available. CPU processing may be slower than the small Vosk model. If you want a different model directory, set `ORVYN_WHISPER_MODEL`.
