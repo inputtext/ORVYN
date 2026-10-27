@@ -209,3 +209,23 @@ To reuse an already-running Ollama process without attempting to launch one:
 ```
 
 Alternatively, `python -m lappy --start-ollama --check` explicitly enables managed startup, whereas `python -m lappy --check` leaves server startup unchanged. Existing processes may use their own model directory; verify that `qwen3:1.7b` is found using the check mode. Voice recording still requires a separately installed Vosk speech model.
+
+
+## ORVYN v0.2 voice foundation (development branch)
+
+Install the Vosk offline speech model explicitly (download is only performed during setup):
+
+```powershell
+.\scripts\setup_voice_windows.ps1
+```
+
+This stores the speech model under `D:\ORVYN\VoiceModels` and sets user variable `ORVYN_VOSK_MODEL`. Open a **new** terminal so the variable is available. Confirm Windows microphone permissions are enabled for desktop apps, then run:
+
+```powershell
+.\run_windows.ps1 -Mode mic-check
+.\run_windows.ps1 -Mode ptt
+```
+
+Push-to-talk: press Enter, say a complete request (e.g. *What is my CPU usage?*), then wait for local recognition and spoken output. Wake mode is available with `.\run_windows.ps1 -Mode voice`; Vosk recognition of coined names is not guaranteed, so test both *Or-vin* and *Or-vee-on*. Use `-NoSpeech` to disable spoken answers. Press Ctrl+C to end voice mode. Audio is processed in RAM; no microphone data is uploaded or written to a recording file by this component.
+
+The `mic-check` mode does not start Ollama or record microphone audio. It checks for Vosk model presence and an accessible input device.
