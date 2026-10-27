@@ -36,6 +36,7 @@ def main() -> int:
                                      description="ORVYN — offline-first, on-device AI assistant")
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument("--check", action="store_true", help="Check local Ollama/model and voice files")
+    modes.add_argument("--mic-check", action="store_true", help="Check offline voice model and microphone without recording")
     modes.add_argument("--voice", action="store_true", help="Wake-word microphone mode")
     modes.add_argument("--push-to-talk", action="store_true", help="Microphone mode with Enter to talk")
     parser.add_argument("--no-speech", action="store_true", help="Disable spoken responses")
@@ -47,6 +48,12 @@ def main() -> int:
     except ValueError as exc:
         print(f"Configuration error: {exc}")
         return 1
+
+    if args.mic_check:
+        from .microphone import microphone_check
+        ready, message = microphone_check(settings.vosk_model_path)
+        print(message)
+        return 0 if ready else 2
 
     if args.start_ollama:
         from .runtime import RuntimeStartupError, ensure_ollama_running
