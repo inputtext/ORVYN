@@ -12,7 +12,7 @@ from .tools import ToolRouter
 
 
 def diagnostics(settings: Settings, planner: OllamaPlanner) -> bool:
-    print("ORVYN v0.1.1 offline prerequisites")
+    print("ORVYN v0.2.0 offline prerequisites")
     print(f"OS: {platform.system()} {platform.release()} | Target: Windows")
     print(f"Ollama endpoint: {settings.ollama_url} (loopback only)")
     ok = True
@@ -39,6 +39,7 @@ def main() -> int:
     modes.add_argument("--voice", action="store_true", help="Wake-word microphone mode")
     modes.add_argument("--push-to-talk", action="store_true", help="Microphone mode with Enter to talk")
     parser.add_argument("--no-speech", action="store_true", help="Disable spoken responses")
+    parser.add_argument("--start-ollama", action="store_true", help="Start local Ollama if not already running")
     args = parser.parse_args()
 
     try:
@@ -46,6 +47,14 @@ def main() -> int:
     except ValueError as exc:
         print(f"Configuration error: {exc}")
         return 1
+
+    if args.start_ollama:
+        from .runtime import RuntimeStartupError, ensure_ollama_running
+        try:
+            print(ensure_ollama_running())
+        except RuntimeStartupError as exc:
+            print(f"Local runtime startup failed: {exc}")
+            return 2
 
     planner = OllamaPlanner(settings.model, settings.ollama_url)
     if args.check:
@@ -82,7 +91,7 @@ def main() -> int:
             print("\nGoodbye!")
             return 0
 
-    print("ORVYN v0.1.1 — LOCAL TEXT MODE. Type 'exit' to quit.")
+    print("ORVYN v0.2.0 — LOCAL TEXT MODE. Type 'exit' to quit.")
     try:
         while True:
             command = input("You > ").strip()
