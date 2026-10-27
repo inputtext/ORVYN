@@ -11,6 +11,7 @@ import time
 # Wake phrases — supports both ORVYN and legacy LAPPY names.
 _WAKE_PHRASES = (
     "hey orvyn", "hey orvin", "hey orven",
+    "hey orvion", "hey or vee on", "hey or vee in",
     "hey lappy", "hey lapi", "hey lapy",
 )
 
