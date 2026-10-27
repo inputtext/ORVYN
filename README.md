@@ -183,3 +183,29 @@ Introduce a local event bus, SQLite context cache, opt-in file index, stronger c
 - Offline SAPI5 speech (pyttsx3): https://github.com/nateshmbhat/pyttsx3
 
 License note: this repository is a learning prototype. No third-party weights, models or installers are redistributed in this archive. Review third-party licenses and commercial-distribution requirements before shipping any packaged product.
+
+
+## ORVYN v0.2.0 — local runtime manager (development branch)
+
+The PowerShell launcher now attempts to start Ollama automatically **only if its local HTTP API is unavailable**. It starts Ollama with `OLLAMA_NO_CLOUD=1`, binds the service to `127.0.0.1:11434`, and uses your configured model directory. There are no model downloads or shell-based actions.
+
+On Windows, set the existing model directory once (PowerShell):
+
+```powershell
+[Environment]::SetEnvironmentVariable('ORVYN_MODELS_DIR','D:\ORVYN\Models','User')
+```
+
+Open a new terminal after changing the environment variable. Start and test:
+
+```powershell
+.\run_windows.ps1 -Mode check
+.\run_windows.ps1 -Mode text
+```
+
+To reuse an already-running Ollama process without attempting to launch one:
+
+```powershell
+.\run_windows.ps1 -Mode text -NoAutoStart
+```
+
+Alternatively, `python -m lappy --start-ollama --check` explicitly enables managed startup, whereas `python -m lappy --check` leaves server startup unchanged. Existing processes may use their own model directory; verify that `qwen3:1.7b` is found using the check mode. Voice recording still requires a separately installed Vosk speech model.
