@@ -2,7 +2,8 @@ param(
     [ValidateSet('text','voice','ptt','check','mic-check')]
     [string] $Mode = 'text',
     [switch] $NoSpeech,
-    [switch] $NoAutoStart
+    [switch] $NoAutoStart,
+    [switch] $Whisper
 )
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
@@ -17,5 +18,6 @@ switch ($Mode) {
     'mic-check' { $arguments += '--mic-check' }
 }
 if ($NoSpeech) { $arguments += '--no-speech' }
+if ($Whisper) { $arguments += '--whisper' }
 Write-Host 'Starting ORVYN v0.2.0...'
 & $python @arguments
