@@ -4,6 +4,16 @@ param(
     [string] $ModelsRoot = 'D:\ORVYN\VoiceModels'
 )
 $ErrorActionPreference = 'Stop'
+$ProjectRoot = Split-Path -Parent $PSScriptRoot
+$Python = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
+if (!(Test-Path $Python)) {
+    throw "Project Python environment is missing at $Python. Create .venv first."
+}
+Write-Host 'Installing voice Python dependencies into the project virtual environment...'
+& $Python -m pip install -r (Join-Path $ProjectRoot 'requirements.txt')
+if ($LASTEXITCODE -ne 0) {
+    throw 'Voice dependency installation failed. Review pip output before continuing.'
+}
 $ProgressPreference = 'SilentlyContinue'
 $ModelName = 'vosk-model-small-en-us-0.15'
 $Destination = Join-Path $ModelsRoot $ModelName
