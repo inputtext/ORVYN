@@ -1,0 +1,1 @@
+-r requirements.txt\nfaster-whisper>=1.1,<2\nhuggingface-hub>=0.25,<2\n
