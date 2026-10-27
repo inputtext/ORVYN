@@ -12,6 +12,18 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ALLOWED_MODELS = ("qwen3:4b", "qwen3:1.7b")
 
 
+def _voice_model_default() -> str:
+    """Prefer the established D: voice model folder when present.
+
+    Antigravity/VS Code terminals can inherit an older environment after an
+    installer updates user variables in a child PowerShell process.
+    """
+    d_drive_model = Path("D:/ORVYN/VoiceModels/vosk-model-small-en-us-0.15")
+    if os.name == "nt" and d_drive_model.is_dir():
+        return str(d_drive_model)
+    return str(PROJECT_ROOT / "models" / "vosk-model-small-en-us-0.15")
+
+
 def _env(orvyn_key: str, lappy_key: str, default: str) -> str:
     """Read ORVYN_* env var, fall back to legacy LAPPY_* for backward compat."""
     return os.environ.get(orvyn_key) or os.environ.get(lappy_key) or default
@@ -41,6 +53,6 @@ class Settings:
             ).expanduser(),
             vosk_model_path=Path(
                 _env("ORVYN_VOSK_MODEL", "LAPPY_VOSK_MODEL",
-                     str(PROJECT_ROOT / "models" / "vosk-model-small-en-us-0.15"))
+                     _voice_model_default())
             ).expanduser(),
         )
