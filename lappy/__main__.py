@@ -40,6 +40,7 @@ def main() -> int:
     modes.add_argument("--voice", action="store_true", help="Wake-word microphone mode")
     modes.add_argument("--push-to-talk", action="store_true", help="Microphone mode with Enter to talk")
     parser.add_argument("--no-speech", action="store_true", help="Disable spoken responses")
+    parser.add_argument("--whisper", action="store_true", help="Use local Whisper for push-to-talk recognition")
     parser.add_argument("--start-ollama", action="store_true", help="Start local Ollama if not already running")
     args = parser.parse_args()
 
@@ -48,6 +49,9 @@ def main() -> int:
     except ValueError as exc:
         print(f"Configuration error: {exc}")
         return 1
+
+    if args.whisper and not args.push_to_talk:
+        parser.error("--whisper requires --push-to-talk")
 
     if args.mic_check:
         from .microphone import microphone_check
@@ -71,7 +75,12 @@ def main() -> int:
     if args.voice or args.push_to_talk:
         from .voice import OfflineVoice, speak
         try:
-            voice = OfflineVoice(settings.vosk_model_path)
+            if args.whisper:
+                from .whisper_voice import WhisperPushToTalk
+                voice = WhisperPushToTalk()
+                print("[Whisper offline] Recording 8-second clips when Enter is pressed.")
+            else:
+                voice = OfflineVoice(settings.vosk_model_path)
             while True:
                 if args.push_to_talk:
                     input("\nPress Enter to speak (Ctrl+C to exit): ")
